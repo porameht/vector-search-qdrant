@@ -14,13 +14,13 @@ class NeuralSearcher:
         self.qdrant_client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY, prefer_grpc=True)
         self.qdrant_client.set_model(EMBEDDINGS_MODEL)
 
-    def search(self, text: str, filter_: dict = None) -> List[dict]:
+    def search(self, text: str, filter_: dict = None, top=5) -> List[dict]:
         start_time = time.time()
         hits = self.qdrant_client.query(
             collection_name=self.collection_name,
             query_text=text,
             query_filter=Filter(**filter_) if filter_ else None,
-            limit=5
+            limit=top
         )
         print(f"Search took {time.time() - start_time} seconds")
         return [hit.metadata for hit in hits]

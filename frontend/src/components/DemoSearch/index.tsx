@@ -46,9 +46,9 @@ export default function DemoSearch({ handleDemoSearch }: DemoSearchProps) {
         radius={"lg"}
         leftIcon={<IconPointerSearch size={"1.3rem"} />}
         className={classes.demoBtn}
-        onClick={() => handleDemoSearch("Qdrant")}
+        onClick={() => handleDemoSearch("อยากแต่งสวน")}
       >
-        Qdrant
+        อยากแต่งสวน
       </Button>
       <Button
         variant="outline"
@@ -56,9 +56,9 @@ export default function DemoSearch({ handleDemoSearch }: DemoSearchProps) {
         color="Primary.2"
         leftIcon={<IconPointerSearch size={"1.3rem"} />}
         className={classes.demoBtn}
-        onClick={() => handleDemoSearch("Wooden furniture")}
+        onClick={() => handleDemoSearch("พรมสำหรับห้องนั่งเล่น")}
       >
-        Wooden furniture
+        พรมสำหรับห้องนั่งเล่น
       </Button>
       <Button
         variant="outline"
@@ -66,9 +66,9 @@ export default function DemoSearch({ handleDemoSearch }: DemoSearchProps) {
         radius={"lg"}
         leftIcon={<IconPointerSearch size={"1.3rem"} />}
         className={classes.demoBtn}
-        onClick={() => handleDemoSearch("Milk Company")}
+        onClick={() => handleDemoSearch("โซฟาห้องนั่งเล่น")}
       >
-        Milk Company
+        โซฟาห้องนั่งเล่น
       </Button>
     </Box>
   );

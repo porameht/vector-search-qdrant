@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from qdrant_demo.config import COLLECTION_NAME, STATIC_DIR
+from qdrant_demo.hybrid_searcher import HybridSearcher
 from qdrant_demo.neural_searcher import NeuralSearcher
 from qdrant_demo.text_searcher import TextSearcher
 
@@ -21,15 +22,15 @@ app.add_middleware(
 
 neural_searcher = NeuralSearcher(collection_name=COLLECTION_NAME)
 text_searcher = TextSearcher(collection_name=COLLECTION_NAME)
-
+hybrid_searcher = HybridSearcher(collection_name=COLLECTION_NAME)
 
 @app.get("/api/search")
-async def read_item(q: str, neural: bool = True):
+async def read_item(q: str, neural: bool = True, hybrid: bool = False):
     return {
-        "result": neural_searcher.search(text=q)
-        if neural else text_searcher.search(query=q)
+        "result": neural_searcher.search(text=q, top=10)
+        if neural else text_searcher.search(query=q, top=10) 
+        # if not hybrid else hybrid_searcher.search(text=q)
     }
-
 
 # Mount the static files directory once the search endpoint is defined
 if os.path.exists(STATIC_DIR):
