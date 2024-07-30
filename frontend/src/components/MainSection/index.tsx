@@ -1,6 +1,4 @@
-// import React from 'react';
 import {
-  // Title,
   Text,
   Button,
   Container,
@@ -49,7 +47,6 @@ export function Main() {
     if (searchType === "image") {
       return (
         <FileInput
-          placeholder="Upload an image"
           icon={<IconUpload size="1rem" />}
           accept="image/*"
           value={imageFile}
@@ -145,21 +142,6 @@ export function Main() {
               {data.result.length > 0 ? (
                 data.result.map((item) => (
                   <Grid.Col span={12} key={item.uuid}>
-                    {/* <StartupCard
-                      name={item.name}
-                      images={item.logo_url}
-                      alt={item.name}
-                      description={item.document}
-                      link={item.homepage_url}
-                      city={
-                        item.city ??
-                        item.region ??
-                        item.country_code ??
-                        "Unknown"
-                      }
-                      onClickFindSimilar={onClickFindSimilar}
-                      Index={item.uuid}
-                    /> */}
                     <ProductCard
                       Index={item.uuid}
                       name={item.name}
