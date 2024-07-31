@@ -1,5 +1,4 @@
 import { Box, Button, Text, createStyles } from "@mantine/core";
-
 import { IconPointerSearch } from "@tabler/icons-react";
 
 const useStyles = createStyles((theme) => ({
@@ -31,45 +30,60 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-type DemoSearchProps = {
-  handleDemoSearch: (query: string) => void;
+type DemoButtonProps = {
+  text: string;
+  onClick: () => void;
 };
 
-export default function DemoSearch({ handleDemoSearch }: DemoSearchProps) {
+type DemoSearchProps = {
+  handleDemoSearch: (query: string, isNeural: boolean) => void;
+  searchType: any;
+  neuralDemoTexts: string[];
+  textDemoTexts: string[];
+  tryThisText?: string;
+};
+
+const DemoButton = ({ text, onClick }: DemoButtonProps) => {
   const { classes } = useStyles();
   return (
+    <Button
+      variant="outline"
+      color="Primary.2"
+      radius="lg"
+      leftIcon={<IconPointerSearch size="1.3rem" />}
+      className={classes.demoBtn}
+      onClick={onClick}
+    >
+      {text}
+    </Button>
+  );
+};
+
+export default function DemoSearch({
+  handleDemoSearch,
+  searchType,
+  neuralDemoTexts,
+  textDemoTexts,
+  tryThisText = "Try this:"
+}: DemoSearchProps) {
+  const { classes } = useStyles();
+
+  const demoTexts = searchType === "neural" ? neuralDemoTexts : textDemoTexts;
+
+  if (searchType === "image") {
+    return null;
+  }
+
+  return (
     <Box className={classes.wrapper}>
-      <Text className={classes.demoText}>Try this:</Text>
-      <Button
-        variant="outline"
-        color="Primary.2"
-        radius={"lg"}
-        leftIcon={<IconPointerSearch size={"1.3rem"} />}
-        className={classes.demoBtn}
-        onClick={() => handleDemoSearch("อยากแต่งสวน")}
-      >
-        อยากแต่งสวน
-      </Button>
-      <Button
-        variant="outline"
-        radius={"lg"}
-        color="Primary.2"
-        leftIcon={<IconPointerSearch size={"1.3rem"} />}
-        className={classes.demoBtn}
-        onClick={() => handleDemoSearch("พรมสำหรับห้องนั่งเล่น")}
-      >
-        พรมสำหรับห้องนั่งเล่น
-      </Button>
-      <Button
-        variant="outline"
-        color="Primary.2"
-        radius={"lg"}
-        leftIcon={<IconPointerSearch size={"1.3rem"} />}
-        className={classes.demoBtn}
-        onClick={() => handleDemoSearch("โซฟาห้องนั่งเล่น")}
-      >
-        โซฟาห้องนั่งเล่น
-      </Button>
+      <Text className={classes.demoText}>{tryThisText}</Text>
+      {demoTexts.map((text, index) => (
+        <DemoButton
+          key={index}
+          text={text}
+          onClick={() => handleDemoSearch(text, searchType === "neural")}
+        />
+      ))}
     </Box>
   );
 }

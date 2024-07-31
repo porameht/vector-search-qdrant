@@ -10,7 +10,7 @@ import {
   SegmentedControl,
   FileInput,
 } from "@mantine/core";
-import { IconSearch, IconUpload } from "@tabler/icons-react";
+import { IconSearch, IconUpload, IconX } from "@tabler/icons-react";
 import { useStyles } from "./style";
 import useMountedState from "@/hooks/useMountedState";
 import { useGetSearchResult } from "@/hooks/useGetSearchResult";
@@ -23,6 +23,7 @@ export function Main() {
   const { classes } = useStyles();
   const [query, setQuery] = useMountedState("");
   const [imageFile, setImageFile] = useMountedState<File | null>(null);
+  const [imagePreview, setImagePreview] = useMountedState<string | null>(null);
   const { data: textData, error: textError, loading: textLoading, getSearch, resetData: resetTextData } = useGetSearchResult();
   const { data: imageData, error: imageError, loading: imageLoading, getImageSearch, resetData: resetImageData } = useGetImageSearchResult();
   const [searchType, setSearchType] = useMountedState("neural");
@@ -49,30 +50,72 @@ export function Main() {
     }
   };
 
+  const handleImageUpload = (file: File | null) => {
+    setImageFile(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImagePreview(null);
+    }
+  };
+
   const renderSearchInput = () => {
     if (searchType === "image") {
       return (
-        <FileInput
-          icon={<IconUpload size="1rem" />}
-          accept="image/*"
-          value={imageFile}
-          onChange={(file) => setImageFile(file)}
-          className={classes.inputArea}
-          rightSection={
-            <Button
-              className={classes.inputRightSection}
-              size={"md"}
-              variant="filled"
-              color="Primary.2"
-              onClick={handleSubmit}
-              disabled={!imageFile}
-            >
-              Search
-            </Button>
-          }
-          rightSectionWidth={"6rem"}
-          placeholder="Upload an image"
-        />
+        <Box>
+          <FileInput
+            icon={<IconUpload size="1rem" />}
+            accept="image/*"
+            value={imageFile}
+            onChange={handleImageUpload}
+            className={classes.inputArea}
+            rightSection={
+              <Button
+                className={classes.inputRightSection}
+                size={"md"}
+                variant="filled"
+                color="Primary.2"
+                onClick={handleSubmit}
+                disabled={!imageFile}
+              >
+                Search
+              </Button>
+            }
+            rightSectionWidth={"6rem"}
+            placeholder="Upload an image"
+          />
+          {imagePreview && (
+            <Box mt="md" sx={{ position: 'relative', width: 'fit-content' }}>
+              <Image
+                src={imagePreview}
+                alt="Uploaded image preview"
+                width={200}
+                height={200}
+                fit="contain"
+              />
+              <Button
+                size="xs"
+                color="red"
+                variant="filled"
+                onClick={() => {
+                  setImageFile(null);
+                  setImagePreview(null);
+                }}
+                sx={{
+                  position: 'absolute',
+                  top: 5,
+                  right: 5,
+                }}
+              >
+                <IconX size="1rem" />
+              </Button>
+            </Box>
+          )}
+        </Box>
       );
     } else {
       return (
@@ -121,6 +164,7 @@ export function Main() {
               resetImageData();
               setQuery("");
               setImageFile(null);
+              setImagePreview(null);
             }}
             size="md"
             color="Primary.2"
@@ -130,7 +174,14 @@ export function Main() {
           {renderSearchInput()}
         </Container>
 
-        <DemoSearch handleDemoSearch={onClickFindSimilar} />
+        <DemoSearch
+          handleDemoSearch={onClickFindSimilar}
+          searchType={searchType}
+          neuralDemoTexts={["อยากแต่งสวน", "พรมสำหรับห้องนั่งเล่น", "โซฟาห้องนั่งเล่น"]}
+          textDemoTexts={["ตู้เย็น", "เครื่องซักผ้า", "พรม"]}
+          tryThisText="ลองค้นหา:"
+        />
+
         <Container className={classes.viewResult}>
           {loading ? (
             <Box sx={{ display: "flex", justifyContent: "center" }}>

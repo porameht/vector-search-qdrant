@@ -82,7 +82,7 @@ export function ProductCard({
     
         }}>
           <Grid.Col sm={6} md={7} >
-            <Badge color="blue" variant="light" size="xl">
+            <Badge color="blue" variant="light" size="md">
               {title}
             </Badge>
             <Text
