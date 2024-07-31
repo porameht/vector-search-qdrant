@@ -14,6 +14,7 @@ import { IconSearch, IconUpload } from "@tabler/icons-react";
 import { useStyles } from "./style";
 import useMountedState from "@/hooks/useMountedState";
 import { useGetSearchResult } from "@/hooks/useGetSearchResult";
+import { useGetImageSearchResult } from "@/hooks/useGetImageSearchResult";
 import { getHotkeyHandler } from "@mantine/hooks";
 import DemoSearch from "../DemoSearch";
 import { ProductCard } from '../ProductCard';
@@ -22,14 +23,18 @@ export function Main() {
   const { classes } = useStyles();
   const [query, setQuery] = useMountedState("");
   const [imageFile, setImageFile] = useMountedState<File | null>(null);
-  const { data, error, loading, getSearch, resetData } = useGetSearchResult();
+  const { data: textData, error: textError, loading: textLoading, getSearch, resetData: resetTextData } = useGetSearchResult();
+  const { data: imageData, error: imageError, loading: imageLoading, getImageSearch, resetData: resetImageData } = useGetImageSearchResult();
   const [searchType, setSearchType] = useMountedState("neural");
 
+  const data = searchType === "image" ? imageData : textData;
+  const error = searchType === "image" ? imageError : textError;
+  const loading = searchType === "image" ? imageLoading : textLoading;
+
+  console.log("Data:", data);
   const handleSubmit = () => {
     if (searchType === "image" && imageFile) {
-      // Handle image search
-      // You'll need to implement the image search functionality
-      console.log("Performing image search with file:", imageFile);
+      getImageSearch(imageFile);
     } else if (query) {
       getSearch(query, searchType === "neural");
     }
@@ -37,7 +42,8 @@ export function Main() {
 
   const onClickFindSimilar = (data: string) => {
     if (data) {
-      resetData();
+      resetTextData();
+      resetImageData();
       setQuery(data);
       getSearch(data, searchType === "neural");
     }
@@ -50,8 +56,22 @@ export function Main() {
           icon={<IconUpload size="1rem" />}
           accept="image/*"
           value={imageFile}
-          onChange={(files) => setImageFile(files)}
+          onChange={(file) => setImageFile(file)}
           className={classes.inputArea}
+          rightSection={
+            <Button
+              className={classes.inputRightSection}
+              size={"md"}
+              variant="filled"
+              color="Primary.2"
+              onClick={handleSubmit}
+              disabled={!imageFile}
+            >
+              Search
+            </Button>
+          }
+          rightSectionWidth={"6rem"}
+          placeholder="Upload an image"
         />
       );
     } else {
@@ -93,12 +113,12 @@ export function Main() {
             data={[
               { label: "Neural", value: "neural" },
               { label: "Text", value: "text" },
-              // { label: "Hybrid", value: "hybrid" },
               { label: "Image", value: "image" },
             ]}
             onChange={(value) => {
               setSearchType(value);
-              resetData();
+              resetTextData();
+              resetImageData();
               setQuery("");
               setImageFile(null);
             }}
@@ -113,26 +133,18 @@ export function Main() {
         <DemoSearch handleDemoSearch={onClickFindSimilar} />
         <Container className={classes.viewResult}>
           {loading ? (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
               <Loader size="xl" color="Primary.2" variant="bars" />
             </Box>
           ) : error ? (
-            <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "center",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <Image maw={240} src="./error.gif" alt="No results found." />
-
+            <Box sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              flexDirection: "column",
+              alignItems: "center",
+            }}>
+              <Image maw={240} src="./error.gif" alt="Error occurred." />
               <Text size="lg" color="dimmed" className={classes.description}>
                 Error: {error}
               </Text>
@@ -155,45 +167,31 @@ export function Main() {
                   </Grid.Col>
                 ))
               ) : (
-                <Box
-                  sx={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                    flexDirection: "column",
-                    alignItems: "center",
-                  }}
-                >
-                  <Image
-                    maw={240}
-                    src="./NoResult.gif"
-                    alt="No results found."
-                  />
-
-                  <Text
-                    size="lg"
-                    color="dimmed"
-                    className={classes.description}
-                  >
-                    No results found. Try to use another query.
+                <Box sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}>
+                  <Image maw={240} src="./NoResult.gif" alt="No results found." />
+                  <Text size="lg" color="dimmed" className={classes.description}>
+                    No results found. Try to use another query or image.
                   </Text>
                 </Box>
               )}
             </Grid>
           ) : (
-            <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "center",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <Image maw={240} src="./home.gif" alt="No results found." />
-
+            <Box sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              flexDirection: "column",
+              alignItems: "center",
+            }}>
+              <Image maw={240} src="./home.gif" alt="Start searching." />
               <Text size="lg" color="dimmed" className={classes.description}>
-                Enter a query to start searching.
+                Enter a query or upload an image to start searching.
               </Text>
             </Box>
           )}

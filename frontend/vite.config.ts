@@ -16,6 +16,10 @@ export default defineConfig(() => {
           target: "http://0.0.0.0:8000/",
           changeOrigin: true,
         },
+        "/image": {
+          target: "http://0.0.0.0:8001/",          
+          changeOrigin: true,
+        },
       },
     }
   };
